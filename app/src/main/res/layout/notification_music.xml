@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_purple"
+    android:layout_gravity="center_horizontal">
+
+    <ImageButton
+        android:id="@+id/play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_baseline_play_arrow_48"
+        android:tint="@android:color/black"
+        android:background="@android:color/transparent"/>
+
+    <ImageButton
+        android:id="@+id/pause"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_baseline_pause_48"
+        android:tint="@android:color/black"
+        android:background="@android:color/transparent"/>
+
+    <TextView
+        android:id="@+id/title_music"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="TEST"
+        android:textSize="24sp"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"/>
+
+</LinearLayout>
