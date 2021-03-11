@@ -6,13 +6,14 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import android.widget.RemoteViews
-import androidx.core.app.NotificationCompat
 import com.example.projetavancemusique.models.MusicFavoris
 import com.example.projetavancemusique.service.MusicPhone
+import com.example.projetavancemusique.service.MusicPlayerService
+import com.example.projetavancemusique.service.MusicPlayerService2
 
 
 class NotificationMusic {
@@ -27,10 +28,27 @@ class NotificationMusic {
 
     private val NOTIFICATION_ID_CUSTOM_BIG = 9
 
-    fun startMusic(context: Context, music: MusicPhone) {
+//    fun startMusic(context: Context, playlist: MutableList<MusicPhone>, position: Int) {
+//        displayNotification(context)
+//        val playlistString : ArrayList<String> = arrayListOf()
+//        playlist.forEach { entry -> playlistString.add(entry.location) }
+//
+//        val intent = Intent(context, MusicPlayerService::class.java)
+//        intent.putExtra("playlist", playlistString)
+//        intent.putExtra("position", position)
+//        intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+//        Log.d("tag-dev", "start music service")
+//        context.startService(intent)
+//    }
+
+    fun startMusic(context: Context, music: String) {
         displayNotification(context)
-        PlayerMusic().getMusic(context, music)
+        val intent = Intent(context, MusicPlayerService::class.java)
+        intent.putExtra("music", music)
+        intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+        context.startService(intent)
     }
+
     fun startMusic(context: Context, music: MusicFavoris) {
         displayNotification(context)
     }

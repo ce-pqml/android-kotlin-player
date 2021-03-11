@@ -3,32 +3,23 @@ package com.example.projetavancemusique.adapters
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.RemoteViews
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetavancemusique.MainActivity
 import com.example.projetavancemusique.NotificationMusic
 import com.example.projetavancemusique.R
-import com.example.projetavancemusique.database.AppDatabaseHelper
 import com.example.projetavancemusique.models.MusicFavoris
 import com.example.projetavancemusique.service.MusicPhone
+import com.example.projetavancemusique.service.MusicPlayerService
+import com.example.projetavancemusique.service.TestService
 
 
 class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var mainActivity: MainActivity, private var musicFavorisAdapter: MusicFavorisAdapter) :
@@ -97,9 +88,34 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
 
         init {
             chooseMusic.setOnClickListener {
-                Log.d("tag-dev", "NOTIFICATION")
+                Log.d("tag-dev", listMusic[adapterPosition].location)
                 val musicToListen = listMusic[adapterPosition]
-                NotificationMusic().startMusic(mainActivity.applicationContext, musicToListen)
+
+                NotificationMusic().startMusic(mainActivity, musicToListen.location)
+
+//                val intent = Intent(mainActivity, MusicPlayerService::class.java)
+
+//                val playlistString : ArrayList<String> = arrayListOf()
+//                listMusic.forEach { entry -> playlistString.add(entry.location) }
+//                Log.d("tag-dev", playlistString[1])
+//                intent.putStringArrayListExtra("playlist", playlistString)
+//                intent.putExtra("position", adapterPosition)
+
+//                intent.putExtra("music", musicToListen.location)
+//                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+//                mainActivity.startService(intent)
+
+//                NotificationMusic().startMusic(mainActivity, listMusic, adapterPosition)
+//                val playlistString : ArrayList<String> = arrayListOf()
+//                listMusic.forEach { entry -> playlistString.add(entry.location) }
+//                val intent = Intent(mainActivity, MusicPlayerService::class.java)
+//                intent.putExtra("playlist", playlistString)
+//                intent.putExtra("position", adapterPosition)
+//                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+//                Log.d("tag-dev", "start music service")
+//                mainActivity.startService(intent)
+
+
 //                val remoteViews:RemoteViews = RemoteViews(mainActivity.getPackageName(), R.layout.notification_music)
 ////                remoteViews.setOnClickPendingIntent(R.id.play, pendingIntent)
 ////                remoteViews.setOnClickPendingIntent(R.id.pause, pendingIntent)
