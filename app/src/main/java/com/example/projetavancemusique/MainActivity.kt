@@ -59,13 +59,15 @@ class MainActivity : AppCompatActivity() {
         this.startService(intent)
 
         findViewById<ImageButton>(R.id.play).setOnClickListener {
-            val play = Intent(NotificationMusic().NOTIFY_PLAY)
-            PendingIntent.getBroadcast(this, 0, play, PendingIntent.FLAG_UPDATE_CURRENT)
+            val i = Intent(this, MusicPlayerService::class.java)
+            i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+            this.startService(i)
         }
 
         findViewById<ImageButton>(R.id.pause).setOnClickListener {
-            val pause = Intent(NotificationMusic().NOTIFY_PAUSE)
-            PendingIntent.getBroadcast(this, 0, pause, PendingIntent.FLAG_UPDATE_CURRENT)
+            val i = Intent(this, MusicPlayerService::class.java)
+            i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PAUSE)
+            this.startService(i)
         }
     }
 
