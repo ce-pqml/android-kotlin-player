@@ -13,7 +13,6 @@ import android.widget.RemoteViews
 import com.example.projetavancemusique.models.MusicFavoris
 import com.example.projetavancemusique.service.MusicPhone
 import com.example.projetavancemusique.service.MusicPlayerService
-import com.example.projetavancemusique.service.MusicPlayerService2
 
 
 class NotificationMusic {
@@ -25,21 +24,6 @@ class NotificationMusic {
 
     val NOTIFY_PLAY = "com.avancemusic.notification.play"
     val NOTIFY_PAUSE = "com.avancemusic.notification.pause"
-
-    private val NOTIFICATION_ID_CUSTOM_BIG = 9
-
-//    fun startMusic(context: Context, playlist: MutableList<MusicPhone>, position: Int) {
-//        displayNotification(context)
-//        val playlistString : ArrayList<String> = arrayListOf()
-//        playlist.forEach { entry -> playlistString.add(entry.location) }
-//
-//        val intent = Intent(context, MusicPlayerService::class.java)
-//        intent.putExtra("playlist", playlistString)
-//        intent.putExtra("position", position)
-//        intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
-//        Log.d("tag-dev", "start music service")
-//        context.startService(intent)
-//    }
 
     fun startMusic(context: Context, playlist: String, position: Int) {
         displayNotification(context)
@@ -57,22 +41,6 @@ class NotificationMusic {
 
 
     fun displayNotification(context: Context) {
-//        val expandedView = RemoteViews(context.getPackageName(), R.layout.notification_music)
-//        val nc = NotificationCompat.Builder(context)
-//        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        val notifyIntent = Intent(context, MainActivity::class.java)
-//        notifyIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-//        val pendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-//        nc.setContentIntent(pendingIntent)
-//        nc.setSmallIcon(R.drawable.ic_launcher_background)
-//        nc.setAutoCancel(true)
-//        nc.setCustomBigContentView(expandedView)
-//        nc.setContentTitle("Music Player")
-//        nc.setContentText("Control Audio")
-////        nc.getBigContentView().setTextViewText(R.id.title_music, "Adele")
-//        setListeners(expandedView, context)
-//        nm.notify(NOTIFICATION_ID_CUSTOM_BIG, nc.build())
-
         var notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val expandedView = RemoteViews(context.getPackageName(), R.layout.notification_music)
         val notifyIntent = Intent(context, MainActivity::class.java)

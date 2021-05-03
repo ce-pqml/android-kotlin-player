@@ -37,19 +37,12 @@ class MusicPlayerService : Service() {
     {
         super.onCreate()
 
-        // media player :
+        // media player
 //        playlist = arrayListOf()
         position = 0
         mediaPlayer = MediaPlayer.create(this, R.raw.titre)
+        //fin du titre en cours
         mediaPlayer.setOnCompletionListener {
-
-            // on signale à l'activité qu'on a atteint la fin du titre :
-//            val intent = Intent()
-//            intent.action = MainActivity.LecteurBroadcastReceiver.INTENT_FILTER
-//            sendBroadcast(intent)
-
-            // on remet à zéro :
-//            mediaPlayer.seekTo(0)
             mediaPlayer.stop()
             position += 1
             var location : String = ""
@@ -67,9 +60,6 @@ class MusicPlayerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         Log.d("tag-dev", "onStartCommand2")
-//        if (intent?.hasExtra("queue") == true) {
-//            playlist = intent.getParcelableArrayExtra("queue") as Array<MusicPhone>
-//        }
         if (intent?.hasExtra(EXTRA_POSITION) == true && intent?.hasExtra(EXTRA_PLAYLIST)) {
             position = intent.getIntExtra(EXTRA_POSITION, 0)
             playlist = intent.getStringExtra(EXTRA_PLAYLIST)

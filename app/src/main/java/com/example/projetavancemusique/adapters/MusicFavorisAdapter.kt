@@ -35,12 +35,9 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
     // Renseigne le contenu de chaque vue item :
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int)
     {
-//        Picasso.get().load("http://www.geognos.com/api/en/countries/flag/"+listCountry[position].alpha2Code+".png").into(holder.imgViewPreview);
         holder.textViewTitle.text = listMusic[position].title
         holder.textViewSize.text = "Taille : " + listMusic[position].size + " (en Mo)"
         holder.textViewDuration.text = "Durée : " + listMusic[position].duration + " (mm:ss)"
-//        val csl = AppCompatResources.getColorStateList(mainActivity, R.color.teal_200)
-//        ImageViewCompat.setImageTintList(holder.btnFavoris, csl);
         holder.btnFavoris.setImageResource(R.drawable.ic_favorite_black_48dp);
     }
 
@@ -104,11 +101,6 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
                 }
 
                 val intent = Intent(mainActivity, MusicPlayerService::class.java)
-//
-//                val playlistString : MutableList<String> = ArrayList()
-//                listMusic.forEach { entry -> playlistString.add(entry.location) }
-////                Log.d("tag-dev", playlistString[1])
-//                intent.putExtra("posi", playlistString.toTypedArray())
 
                 intent.putExtra("queue", listMusic.toTypedArray())
                 intent.putExtra("position", adapterPosition)

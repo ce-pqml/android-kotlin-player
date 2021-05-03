@@ -27,12 +27,6 @@ import com.example.projetavancemusique.service.MusicPlayerService
 class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var mainActivity: MainActivity, private var musicFavorisAdapter: MusicFavorisAdapter) :
     RecyclerView.Adapter<MusicAdapter.MusicViewHolder>()
 {
-    lateinit var notificationManager: NotificationManager
-    lateinit var notificationChannel: NotificationChannel
-    lateinit var builder: Notification.Builder
-    private val channelId = "i.apps.notifications"
-    private val description = "Test notification"
-
     // Crée chaque vue item à afficher :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder
     {
@@ -43,17 +37,12 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
     // Renseigne le contenu de chaque vue item :
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int)
     {
-//        Picasso.get().load("http://www.geognos.com/api/en/countries/flag/"+listCountry[position].alpha2Code+".png").into(holder.imgViewPreview);
         holder.textViewTitle.text = listMusic[position].title
         holder.textViewSize.text = "Taille : " + listMusic[position].size + " (en Mo)"
         holder.textViewDuration.text = "Durée : " + listMusic[position].duration + " (mm:ss)"
         if (listMusic[position].favorite) {
-//            val csl = AppCompatResources.getColorStateList(mainActivity, R.color.teal_200)
-//            ImageViewCompat.setImageTintList(holder.btnFavoris, csl);
             holder.btnFavoris.setImageResource(R.drawable.ic_favorite_black_48dp);
         } else {
-//            val csl = AppCompatResources.getColorStateList(mainActivity, R.color.black)
-//            ImageViewCompat.setImageTintList(holder.btnFavoris, csl);
             holder.btnFavoris.setImageResource(R.drawable.ic_favorite_border_black_48dp);
         }
     }
@@ -97,63 +86,6 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
                 if (!action_btn.isVisible) {
                     action_btn.visibility = View.VISIBLE
                 }
-
-//                val intent = Intent(mainActivity, MusicPlayerService::class.java)
-//
-//                val playlistString : MutableList<String> = ArrayList()
-//                listMusic.forEach { entry -> playlistString.add(entry.location) }
-////                Log.d("tag-dev", playlistString[1])
-//                intent.putExtra("posi", playlistString.toTypedArray())
-
-//                intent.putExtra("queue", listMusic.toTypedArray())
-//                intent.putExtra("position", adapterPosition)
-//                intent.putExtra("music", musicToListen.location)
-//                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
-//                mainActivity.startService(intent)
-
-//                NotificationMusic().startMusic(mainActivity, listMusic, adapterPosition)
-//                val playlistString : ArrayList<String> = arrayListOf()
-//                listMusic.forEach { entry -> playlistString.add(entry.location) }
-//                val intent = Intent(mainActivity, MusicPlayerService::class.java)
-//                intent.putExtra("playlist", playlistString)
-//                intent.putExtra("position", adapterPosition)
-//                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
-//                Log.d("tag-dev", "start music service")
-//                mainActivity.startService(intent)
-
-
-//                val remoteViews:RemoteViews = RemoteViews(mainActivity.getPackageName(), R.layout.notification_music)
-////                remoteViews.setOnClickPendingIntent(R.id.play, pendingIntent)
-////                remoteViews.setOnClickPendingIntent(R.id.pause, pendingIntent)
-//
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    notificationChannel = NotificationChannel(channelId, description, NotificationManager.IMPORTANCE_HIGH)
-//                    notificationChannel.enableLights(true)
-//                    notificationChannel.lightColor = Color.GREEN
-//                    notificationChannel.enableVibration(false)
-//                    notificationManager.createNotificationChannel(notificationChannel)
-//
-//                    builder = Notification.Builder(mainActivity, channelId)
-//                            .setContentText("test")
-//                            .setSmallIcon(R.drawable.ic_launcher_background)
-//                            .setLargeIcon(BitmapFactory.decodeResource(mainActivity.resources, R.drawable.ic_launcher_background))
-////                            .setContentIntent(pendingIntent)
-//                            .setCustomContentView(remoteViews)
-//                            .setOngoing(true)
-//                            .setAutoCancel(true)
-//                } else {
-//
-//                    builder = Notification.Builder(mainActivity)
-//                            .setContentText("test")
-//                            .setSmallIcon(R.drawable.ic_launcher_background)
-//                            .setLargeIcon(BitmapFactory.decodeResource(mainActivity.resources, R.drawable.ic_launcher_background))
-////                            .setContentIntent(pendingIntent)
-//                            .setCustomContentView(remoteViews)
-//                            .setOngoing(true)
-//                            .setAutoCancel(true)
-//                }
-//                notificationManager.notify(1234, builder.build())
-
             }
 
             btnFavoris.setOnClickListener {

@@ -5,9 +5,6 @@ import com.example.projetavancemusique.models.MusicFavoris
 
 @Dao
 abstract class MusicFavorisDAO {
-//    @Query("SELECT * FROM musicFavoris WHERE alpha2Code = :alpha2Code")
-//    abstract fun getCountryVisitByCode(alpha2Code: String): MusicFavoris
-//
     @Query("SELECT * FROM musicFavoris")
     abstract fun getMusicFavoris(): MutableList<MusicFavoris>
 
