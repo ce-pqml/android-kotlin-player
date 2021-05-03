@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "musicFavoris")
 class MusicFavoris (
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    var id: Long = 0,
     val title: String = "",
     val size: Double = 0.0,
     val duration: String = "",

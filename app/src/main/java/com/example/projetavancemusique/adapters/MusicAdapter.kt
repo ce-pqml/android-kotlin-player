@@ -61,6 +61,10 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
     {
         this.listMusic = listMusic
         notifyDataSetChanged()
+
+        val intent = Intent(mainActivity, MusicPlayerService::class.java)
+        intent.putExtra(MusicPlayerService.EXTRA_GET_PLAYLIST, MusicPlayerService.PLAYLIST_FAVORIS)
+        mainActivity.startService(intent)
     }
 
     // ViewHolder :

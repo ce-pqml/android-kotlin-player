@@ -9,3 +9,4 @@ Une activité comprenant deux listes : musique sur le téléphone / musique en f
 ## Action : 
 * Mettre un titre en favoris, l'enlever des favoris.
 * Lire un titre en cliquant dessus, contrôler la lecture sur l'activité et/ou depuis une notification
+* Lecture automatique, passe au titre suivant. Si pas de titre suivant, reviens au début

@@ -51,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<RecyclerView>(R.id.list_box).setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
+        layoutManager.reverseLayout = false
+        layoutManager.stackFromEnd = false
         findViewById<RecyclerView>(R.id.list_box).layoutManager = layoutManager
 
         if (listMusic != null) {

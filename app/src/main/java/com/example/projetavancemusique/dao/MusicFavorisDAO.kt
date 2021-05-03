@@ -9,7 +9,7 @@ abstract class MusicFavorisDAO {
     abstract fun getMusicFavoris(): MutableList<MusicFavoris>
 
     @Insert
-    abstract fun insert(vararg musicFavoris: MusicFavoris)
+    abstract fun insert(musicFavoris: MusicFavoris): Long
 
     @Update
     abstract fun update(vararg musicFavoris: MusicFavoris)

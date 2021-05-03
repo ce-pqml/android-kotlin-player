@@ -46,20 +46,25 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
 
     fun addItem(musicFavoris: MusicFavoris)
     {
-        listMusic.add(0, musicFavoris)
-        AppDatabaseHelper.getDatabase(mainActivity)
+        listMusic.add(listMusic.size, musicFavoris)
+        val id = AppDatabaseHelper.getDatabase(mainActivity)
             .musicFavorisDAO()
             .insert(musicFavoris)
-        notifyItemChanged(0)
+//        notifyItemChanged(0)
+        musicFavoris.id = id
+        Log.d("tag-dev", "$id")
+        notifyDataSetChanged()
     }
 
     fun removeItemWithIdPhone(idPhone: Int) {
         val musicToDelete = listMusic.find { it.idPhone == idPhone }
         if (musicToDelete != null) {
             listMusic.remove(musicToDelete)
+
             AppDatabaseHelper.getDatabase(mainActivity)
                 .musicFavorisDAO()
                 .delete(musicToDelete)
+
             notifyDataSetChanged()
         }
     }
@@ -67,10 +72,16 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
     fun removeItem(position: Int) {
         val musicToDelete = listMusic[position]
         listMusic.removeAt(position)
+
         AppDatabaseHelper.getDatabase(mainActivity)
             .musicFavorisDAO()
             .delete(musicToDelete)
+
         notifyDataSetChanged()
+
+        val intent = Intent(mainActivity, MusicPlayerService::class.java)
+        intent.putExtra(MusicPlayerService.EXTRA_GET_PLAYLIST, MusicPlayerService.PLAYLIST_FAVORIS)
+        mainActivity.startService(intent)
     }
 
     fun updateList(listMusic: MutableList<MusicFavoris>)
@@ -119,7 +130,6 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
                         listMusicPhone!![indexToChange].favorite = false
                     }
                 }
-
                 removeItem(adapterPosition)
             }
         }
