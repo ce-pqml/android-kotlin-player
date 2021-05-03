@@ -40,7 +40,7 @@ fun getAllMusicPhone(listMusicFavoris: MutableList<MusicFavoris>, context: Conte
             if (!c.getString(4).equals("<unknown>")) {
                 title = c.getString(0) + " - " + c.getString(4)
             }
-            val size: Double = bytesToMo(c.getDouble(1))
+            val size: Double = octetToMo(c.getDouble(1))
             val duration: String = msToMinuteAndSec(c.getInt(2))
             val path: String = c.getString(3)
             val idPhone: Int = c.getInt(5)
@@ -59,9 +59,9 @@ fun getAllMusicPhone(listMusicFavoris: MutableList<MusicFavoris>, context: Conte
     return tempAudioList
 }
 
-fun bytesToMo(bytes: Double): Double {
+fun octetToMo(octet: Double): Double {
     //Passage d'un bytes en Mo (en divise par 8 pour passer en Octet puis par 1000000 pour passer en Mo)
-    return round((bytes/8/1000000) *100)/100
+    return round((octet/1000000) *100)/100
 }
 
 fun msToMinuteAndSec(ms: Int): String {

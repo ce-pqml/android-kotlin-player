@@ -41,10 +41,12 @@ class NotificationMusic {
 //        context.startService(intent)
 //    }
 
-    fun startMusic(context: Context, music: String) {
+    fun startMusic(context: Context, playlist: String, position: Int) {
         displayNotification(context)
         val intent = Intent(context, MusicPlayerService::class.java)
-        intent.putExtra("music", music)
+
+        intent.putExtra(MusicPlayerService.EXTRA_PLAYLIST, playlist)
+        intent.putExtra(MusicPlayerService.EXTRA_POSITION, position)
         intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
         context.startService(intent)
     }
@@ -87,8 +89,8 @@ class NotificationMusic {
             builder = Notification.Builder(context, channelId)
                     .setContentIntent(pendingIntent)
                     .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setAutoCancel(true)
-                    .setCustomBigContentView(expandedView)
+                    .setCustomContentView(expandedView)
+//                    .setCustomBigContentView(expandedView)
                     .setContentTitle("Music Player")
                     .setContentText("Control Audio")
                     .setOngoing(true)
@@ -97,7 +99,7 @@ class NotificationMusic {
             builder = Notification.Builder(context)
                     .setContentIntent(pendingIntent)
                     .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setAutoCancel(true)
+//                    .setCustomContentView(expandedView)
 //                    .setCustomBigContentView(expandedView)
                     .setContentTitle("Music Player")
                     .setContentText("Control Audio")

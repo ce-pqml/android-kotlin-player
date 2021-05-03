@@ -1,12 +1,18 @@
 package com.example.projetavancemusique
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.RemoteViews
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +22,7 @@ import com.example.projetavancemusique.database.AppDatabaseHelper
 import com.example.projetavancemusique.models.MusicFavoris
 import com.example.projetavancemusique.service.getAllMusicPhone
 import com.example.projetavancemusique.service.MusicPhone
+import com.example.projetavancemusique.service.MusicPlayerService
 
 
 class MainActivity : AppCompatActivity() {
@@ -45,6 +52,20 @@ class MainActivity : AppCompatActivity() {
             findViewById<ProgressBar>(R.id.loader).setVisibility(View.GONE)
         } else {
             findViewById<ProgressBar>(R.id.loader).setVisibility(View.GONE)
+        }
+
+        val intent = Intent(this, MusicPlayerService::class.java)
+        intent.putExtra(MusicPlayerService.EXTRA_GET_PLAYLIST, MusicPlayerService.PLAYLIST_BOTH)
+        this.startService(intent)
+
+        findViewById<ImageButton>(R.id.play).setOnClickListener {
+            val play = Intent(NotificationMusic().NOTIFY_PLAY)
+            PendingIntent.getBroadcast(this, 0, play, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        findViewById<ImageButton>(R.id.pause).setOnClickListener {
+            val pause = Intent(NotificationMusic().NOTIFY_PAUSE)
+            PendingIntent.getBroadcast(this, 0, pause, PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
 

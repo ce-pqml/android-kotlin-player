@@ -1,14 +1,17 @@
 package com.example.projetavancemusique.adapters
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetavancemusique.MainActivity
@@ -16,6 +19,7 @@ import com.example.projetavancemusique.R
 import com.example.projetavancemusique.database.AppDatabaseHelper
 import com.example.projetavancemusique.models.MusicFavoris
 import com.example.projetavancemusique.service.MusicPhone
+import com.example.projetavancemusique.service.MusicPlayerService
 
 
 class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, private var mainActivity: MainActivity, private var listMusicPhone : MutableList<MusicPhone>?) :
@@ -88,6 +92,31 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
         val btnFavoris: ImageButton = itemView.findViewById(R.id.music_favoris_btn)
 
         init {
+            chooseMusic.setOnClickListener {
+                Log.d("tag-dev", listMusic[adapterPosition].location)
+                val musicToListen = listMusic[adapterPosition]
+
+//                NotificationMusic().startMusic(mainActivity, musicToListen.location)
+
+                val action_btn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
+                if (!action_btn.isVisible) {
+                    action_btn.visibility = View.VISIBLE
+                }
+
+                val intent = Intent(mainActivity, MusicPlayerService::class.java)
+//
+//                val playlistString : MutableList<String> = ArrayList()
+//                listMusic.forEach { entry -> playlistString.add(entry.location) }
+////                Log.d("tag-dev", playlistString[1])
+//                intent.putExtra("posi", playlistString.toTypedArray())
+
+                intent.putExtra("queue", listMusic.toTypedArray())
+                intent.putExtra("position", adapterPosition)
+                intent.putExtra("music", musicToListen.location)
+                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+                mainActivity.startService(intent)
+            }
+
             btnFavoris.setOnClickListener {
                 val musicFavorisToRemove = listMusic[adapterPosition]
                 if (listMusicPhone != null) {

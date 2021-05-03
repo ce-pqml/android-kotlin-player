@@ -1,5 +1,9 @@
 package com.example.projetavancemusique.service
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 class MusicPhone (
     val title: String = "",
     val size: Double = 0.0,
@@ -7,4 +11,4 @@ class MusicPhone (
     val location: String = "",
     val idPhone: Int = 0,
     var favorite: Boolean = false
-)
+) : Parcelable

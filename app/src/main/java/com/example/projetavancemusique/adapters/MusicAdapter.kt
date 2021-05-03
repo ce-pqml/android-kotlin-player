@@ -5,13 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetavancemusique.MainActivity
 import com.example.projetavancemusique.NotificationMusic
@@ -19,7 +22,6 @@ import com.example.projetavancemusique.R
 import com.example.projetavancemusique.models.MusicFavoris
 import com.example.projetavancemusique.service.MusicPhone
 import com.example.projetavancemusique.service.MusicPlayerService
-import com.example.projetavancemusique.service.TestService
 
 
 class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var mainActivity: MainActivity, private var musicFavorisAdapter: MusicFavorisAdapter) :
@@ -45,8 +47,6 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
         holder.textViewTitle.text = listMusic[position].title
         holder.textViewSize.text = "Taille : " + listMusic[position].size + " (en Mo)"
         holder.textViewDuration.text = "Durée : " + listMusic[position].duration + " (mm:ss)"
-        Log.d("tag-dev", listMusic[position].idPhone.toString())
-        Log.d("tag-dev", listMusic[position].favorite.toString())
         if (listMusic[position].favorite) {
 //            val csl = AppCompatResources.getColorStateList(mainActivity, R.color.teal_200)
 //            ImageViewCompat.setImageTintList(holder.btnFavoris, csl);
@@ -91,16 +91,22 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
                 Log.d("tag-dev", listMusic[adapterPosition].location)
                 val musicToListen = listMusic[adapterPosition]
 
-                NotificationMusic().startMusic(mainActivity, musicToListen.location)
+                NotificationMusic().startMusic(mainActivity, MusicPlayerService.PLAYLIST_PHONE , adapterPosition)
+
+                val action_btn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
+                if (!action_btn.isVisible) {
+                    action_btn.visibility = View.VISIBLE
+                }
 
 //                val intent = Intent(mainActivity, MusicPlayerService::class.java)
-
-//                val playlistString : ArrayList<String> = arrayListOf()
+//
+//                val playlistString : MutableList<String> = ArrayList()
 //                listMusic.forEach { entry -> playlistString.add(entry.location) }
-//                Log.d("tag-dev", playlistString[1])
-//                intent.putStringArrayListExtra("playlist", playlistString)
-//                intent.putExtra("position", adapterPosition)
+////                Log.d("tag-dev", playlistString[1])
+//                intent.putExtra("posi", playlistString.toTypedArray())
 
+//                intent.putExtra("queue", listMusic.toTypedArray())
+//                intent.putExtra("position", adapterPosition)
 //                intent.putExtra("music", musicToListen.location)
 //                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
 //                mainActivity.startService(intent)
