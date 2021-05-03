@@ -42,7 +42,7 @@ class NotificationMusic {
 
     fun displayNotification(context: Context) {
         var notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val expandedView = RemoteViews(context.getPackageName(), R.layout.notification_music)
+        val expandedView = RemoteViews(context.packageName, R.layout.notification_music)
         val notifyIntent = Intent(context, MainActivity::class.java)
         notifyIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         val pendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -75,7 +75,7 @@ class NotificationMusic {
                     .setAutoCancel(true)
         }
         setListeners(expandedView, context)
-        notificationManager.notify(1234, builder.build())
+        notificationManager.notify(7634, builder.build())
     }
 
     private fun setListeners(view: RemoteViews, context: Context) {

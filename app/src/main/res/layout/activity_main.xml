@@ -22,19 +22,26 @@
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/list_box">
-        <ImageButton
-            android:id="@+id/play"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:src="@drawable/ic_baseline_play_arrow_48"
-            android:tint="@android:color/black"
-            android:background="@android:color/transparent"/>
+<!--        <ImageButton-->
+<!--            android:id="@+id/play"-->
+<!--            android:layout_width="64dp"-->
+<!--            android:layout_height="64dp"-->
+<!--            android:src="@drawable/ic_baseline_play_arrow_48"-->
+<!--            android:tint="@android:color/black"-->
+<!--            android:background="@android:color/transparent"/>-->
 
         <ImageButton
-            android:id="@+id/pause"
+            android:id="@+id/play_pause"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/ic_baseline_pause_48"
+            android:tint="@android:color/black"
+            android:background="@android:color/transparent"/>
+        <ImageButton
+            android:id="@+id/stop_btn"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_baseline_stop_48"
             android:tint="@android:color/black"
             android:background="@android:color/transparent"/>
     </LinearLayout>

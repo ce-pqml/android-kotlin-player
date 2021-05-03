@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetavancemusique.MainActivity
+import com.example.projetavancemusique.NotificationMusic
 import com.example.projetavancemusique.R
 import com.example.projetavancemusique.database.AppDatabaseHelper
 import com.example.projetavancemusique.models.MusicFavoris
@@ -95,18 +96,19 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
 
 //                NotificationMusic().startMusic(mainActivity, musicToListen.location)
 
-                val action_btn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
-                if (!action_btn.isVisible) {
-                    action_btn.visibility = View.VISIBLE
+                val actionBtn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
+                if (!actionBtn.isVisible) {
+                    actionBtn.visibility = View.VISIBLE
                 }
 
-                val intent = Intent(mainActivity, MusicPlayerService::class.java)
-
-                intent.putExtra("queue", listMusic.toTypedArray())
-                intent.putExtra("position", adapterPosition)
-                intent.putExtra("music", musicToListen.location)
-                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
-                mainActivity.startService(intent)
+//                val intent = Intent(mainActivity, MusicPlayerService::class.java)
+//
+//                intent.putExtra("queue", listMusic.toTypedArray())
+//                intent.putExtra("position", adapterPosition)
+//                intent.putExtra("music", musicToListen.location)
+//                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+//                mainActivity.startService(intent)
+                NotificationMusic().startMusic(mainActivity, MusicPlayerService.PLAYLIST_FAVORIS , adapterPosition)
             }
 
             btnFavoris.setOnClickListener {
