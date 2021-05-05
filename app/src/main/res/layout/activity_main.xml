@@ -52,5 +52,13 @@
         app:layout_constraintTop_toBottomOf="@id/btn_player_liste"
         app:layout_constraintBottom_toBottomOf="parent"
         style="@style/background_white"/>
-
+    <TextView
+        android:id="@+id/denied_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/access_denied"
+        android:textSize="20sp"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ProjetAvanceMusique</string>
+    <string name="access_denied">L\'application a besoin de votre permission pour pouvoir accéder aux musiques de votre téléphone.</string>
 </resources>

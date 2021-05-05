@@ -1,10 +1,12 @@
 package com.example.projetavancemusique
 
+import android.Manifest
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -13,7 +15,10 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,44 +46,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val listMusicFavoris: MutableList<MusicFavoris> = AppDatabaseHelper.getDatabase(this)
-            .musicFavorisDAO()
-            .getMusicFavoris()
-
-        val listMusic = getAllMusicPhone(listMusicFavoris, this)
-
-        musicFavorisAdapter = MusicFavorisAdapter(listMusicFavoris, this, listMusic)
-
-        findViewById<RecyclerView>(R.id.list_box).setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.reverseLayout = false
-        layoutManager.stackFromEnd = false
-        findViewById<RecyclerView>(R.id.list_box).layoutManager = layoutManager
-
-        if (listMusic != null) {
-            musicAdapter = MusicAdapter(listMusic, this, musicFavorisAdapter)
-            findViewById<RecyclerView>(R.id.list_box).adapter = musicAdapter
-            findViewById<ProgressBar>(R.id.loader).setVisibility(View.GONE)
+        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            loadPlaylist()
         } else {
-            findViewById<ProgressBar>(R.id.loader).setVisibility(View.GONE)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 473)
         }
-
-        val intent = Intent(this, MusicPlayerService::class.java)
-        intent.putExtra(MusicPlayerService.EXTRA_GET_PLAYLIST, MusicPlayerService.PLAYLIST_BOTH)
-        this.startService(intent)
-
-//        findViewById<ImageButton>(R.id.play).setOnClickListener {
-//            val i = Intent(this, MusicPlayerService::class.java)
-//            i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
-//            this.startService(i)
-//        }
-//
-//        findViewById<ImageButton>(R.id.pause).setOnClickListener {
-//            val i = Intent(this, MusicPlayerService::class.java)
-//            i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PAUSE)
-//            this.startService(i)
-//        }
-
         val playPause: ImageButton = findViewById(R.id.play_pause)
         playPause.setOnClickListener {
             val imgTag: String? = playPause.tag as? String
@@ -111,6 +84,33 @@ class MainActivity : AppCompatActivity() {
 
         monBroadcastReceiver = BtnBroadcastReceiver()
         registerReceiver(monBroadcastReceiver, IntentFilter("com.android.activity.BTN_PLAYER"))
+    }
+
+    fun loadPlaylist() {
+        findViewById<TextView>(R.id.denied_msg).visibility = View.GONE
+        val listMusicFavoris: MutableList<MusicFavoris> = AppDatabaseHelper.getDatabase(this)
+                .musicFavorisDAO()
+                .getMusicFavoris()
+        val listMusic = getAllMusicPhone(listMusicFavoris, this)
+        musicFavorisAdapter = MusicFavorisAdapter(listMusicFavoris, this, listMusic)
+
+        findViewById<RecyclerView>(R.id.list_box).setHasFixedSize(true)
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.reverseLayout = false
+        layoutManager.stackFromEnd = false
+        findViewById<RecyclerView>(R.id.list_box).layoutManager = layoutManager
+
+        if (listMusic != null) {
+            musicAdapter = MusicAdapter(listMusic, this, musicFavorisAdapter)
+            findViewById<RecyclerView>(R.id.list_box).adapter = musicAdapter
+            findViewById<ProgressBar>(R.id.loader).visibility = View.GONE
+        } else {
+            findViewById<ProgressBar>(R.id.loader).visibility = View.GONE
+        }
+
+        val intent = Intent(this, MusicPlayerService::class.java)
+        intent.putExtra(MusicPlayerService.EXTRA_GET_PLAYLIST, MusicPlayerService.PLAYLIST_BOTH)
+        this.startService(intent)
     }
 
     fun changeBtn(action: String?)
@@ -146,6 +146,16 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == 473) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                loadPlaylist()
+            } else {
+                findViewById<ProgressBar>(R.id.loader).visibility = View.GONE
+            }
         }
     }
 }
