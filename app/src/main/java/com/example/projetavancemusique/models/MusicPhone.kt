@@ -1,4 +1,4 @@
-package com.example.projetavancemusique.service
+package com.example.projetavancemusique.models
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
