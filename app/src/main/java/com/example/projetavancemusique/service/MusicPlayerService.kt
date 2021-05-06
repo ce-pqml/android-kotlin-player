@@ -24,7 +24,9 @@ class MusicPlayerService : Service() {
         // Constantes :
         const val EXTRA_COMMANDE = "EXTRA_COMMANDE"
         const val COMMANDE_PLAY = "COMMANDE_PLAY"
+        const val COMMANDE_PLAY_ID = 264
         const val COMMANDE_PAUSE = "COMMANDE_PAUSE"
+        const val COMMANDE_PAUSE_ID = 265
         const val COMMANDE_STOP = "COMMANDE_STOP"
         const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
         const val EXTRA_POSITION = "EXTRA_POSITION"
@@ -82,12 +84,12 @@ class MusicPlayerService : Service() {
             }
             mediaPlayer = MediaPlayer.create(this, Uri.parse(location))
         }
-        if (intent !== null && intent.hasExtra("music")) {
-            if (mediaPlayer.isPlaying) {
-                mediaPlayer.stop()
-            }
-            mediaPlayer = MediaPlayer.create(this, Uri.parse(intent.getStringExtra("music")))
-        }
+//        if (intent !== null && intent.hasExtra("music")) {
+//            if (mediaPlayer.isPlaying) {
+//                mediaPlayer.stop()
+//            }
+//            mediaPlayer = MediaPlayer.create(this, Uri.parse(intent.getStringExtra("music")))
+//        }
 
         // si on reçoit le intent de renouveller les playlist
         // possibiliter de choisir une playlist ou les deux
@@ -214,7 +216,7 @@ class MusicPlayerService : Service() {
                     .setContentTitle("Music Player")
                     .setContentText("Control Audio")
                     .setOngoing(true)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
         } else {
             builder = Notification.Builder(context)
                     .setContentIntent(pendingIntent)
@@ -224,22 +226,25 @@ class MusicPlayerService : Service() {
                     .setContentTitle("Music Player")
                     .setContentText("Control Audio")
                     .setOngoing(true)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
         }
 
         // on ajoute a gestion des boutons
-        setListeners(expandedView, context)
+        setListeners(expandedView)
         return builder
     }
 
     // function de gestion des boutons
     // action à effectuer au clic
-    private fun setListeners(view: RemoteViews, context: Context) {
-        val pause = Intent(NOTIFY_PAUSE)
-        val play = Intent(NOTIFY_PLAY)
-        val pPause = PendingIntent.getBroadcast(context, 0, pause, PendingIntent.FLAG_UPDATE_CURRENT)
-        view.setOnClickPendingIntent(R.id.pause, pPause)
-        val pPlay = PendingIntent.getBroadcast(context, 0, play, PendingIntent.FLAG_UPDATE_CURRENT)
-        view.setOnClickPendingIntent(R.id.play, pPlay)
+    private fun setListeners(view: RemoteViews) {
+        val intentPlay = Intent(this, MusicPlayerService::class.java)
+        intentPlay.putExtra(EXTRA_COMMANDE, COMMANDE_PLAY)
+        val pendingIntentPlay = PendingIntent.getService(this, COMMANDE_PLAY_ID, intentPlay, PendingIntent.FLAG_UPDATE_CURRENT)
+        view.setOnClickPendingIntent(R.id.play, pendingIntentPlay)
+
+        val intentPause = Intent(this, MusicPlayerService::class.java)
+        intentPause.putExtra(EXTRA_COMMANDE, COMMANDE_PAUSE)
+        val pendingIntentPause = PendingIntent.getService(this, COMMANDE_PAUSE_ID, intentPause, PendingIntent.FLAG_UPDATE_CURRENT)
+        view.setOnClickPendingIntent(R.id.pause, pendingIntentPause)
     }
 }
