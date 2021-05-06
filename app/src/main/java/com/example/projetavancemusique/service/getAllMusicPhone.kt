@@ -4,8 +4,8 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import com.example.projetavancemusique.models.MusicFavoris
+import com.example.projetavancemusique.models.MusicPhone
 import kotlin.math.round
 
 fun getAllMusicPhone(listMusicFavoris: MutableList<MusicFavoris>, context: Context): MutableList<MusicPhone>? {
@@ -46,8 +46,6 @@ fun getAllMusicPhone(listMusicFavoris: MutableList<MusicFavoris>, context: Conte
             val idPhone: Int = c.getInt(5)
             var favorite: Boolean = false
             if (listMusicFavoris.find{it.idPhone == idPhone} !== null) {
-                Log.d("tag-dev", idPhone.toString())
-                Log.d("tag-dev", listMusicFavoris.find{it.idPhone == idPhone}.toString())
                 favorite = true
             }
             val musicPhone = MusicPhone(title, size, duration, path, idPhone, favorite)

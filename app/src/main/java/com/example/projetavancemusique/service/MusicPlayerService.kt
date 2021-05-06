@@ -1,15 +1,20 @@
 package com.example.projetavancemusique.service
 
-import android.app.Service
+import android.app.*
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.media.MediaPlayer
-import android.media.MediaPlayer.OnCompletionListener
 import android.net.Uri
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.RemoteViews
+import com.example.projetavancemusique.MainActivity
 import com.example.projetavancemusique.R
 import com.example.projetavancemusique.database.AppDatabaseHelper
 import com.example.projetavancemusique.models.MusicFavoris
+import com.example.projetavancemusique.models.MusicPhone
 
 
 class MusicPlayerService : Service() {
@@ -27,6 +32,12 @@ class MusicPlayerService : Service() {
         const val PLAYLIST_PHONE = "PLAYLIST_PHONE"
         const val PLAYLIST_FAVORIS = "PLAYLIST_FAVORIS"
         const val PLAYLIST_BOTH = "PLAYLIST_BOTH"
+        const val NOTIFY_PLAY = "com.avancemusic.notification.play"
+        const val NOTIFY_PAUSE = "com.avancemusic.notification.pause"
+        const val NOTIFY_ID = 7634
+
+        var isServiceRunning: Boolean = false
+        var isMusicPlay: Boolean = false
     }
 
     // Prérequis :
@@ -35,6 +46,12 @@ class MusicPlayerService : Service() {
     private var playlist_phone : MutableList<MusicPhone>? = arrayListOf()
     private lateinit var playlist_favoris : MutableList<MusicFavoris>
     private var position: Int = 0
+
+    // Prérequis notification :
+    lateinit var notificationChannel: NotificationChannel
+    lateinit var builder: Notification.Builder
+    private val channelId = "i.apps.ca.musiquefav.gestion"
+    private val description = "Notification gestion musique"
 
     override fun onCreate()
     {
@@ -47,7 +64,8 @@ class MusicPlayerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
-        Log.d("tag-dev", "onStartCommand")
+        // si on reçoit le intent de choix de musique
+        // la playlist choisis, la position,
         if (intent !== null && intent.hasExtra(EXTRA_POSITION) && intent.hasExtra(EXTRA_PLAYLIST)) {
             position = intent.getIntExtra(EXTRA_POSITION, 0)
             playlist = intent.getStringExtra(EXTRA_PLAYLIST)
@@ -70,6 +88,9 @@ class MusicPlayerService : Service() {
             }
             mediaPlayer = MediaPlayer.create(this, Uri.parse(intent.getStringExtra("music")))
         }
+
+        // si on reçoit le intent de renouveller les playlist
+        // possibiliter de choisir une playlist ou les deux
         if (intent !== null && intent.hasExtra(EXTRA_GET_PLAYLIST)) {
             when (intent.getStringExtra(EXTRA_GET_PLAYLIST)) {
                 PLAYLIST_PHONE -> {
@@ -88,18 +109,18 @@ class MusicPlayerService : Service() {
                 }
             }
         }
-        if (intent !== null && intent.hasExtra(EXTRA_COMMANDE))
-        {
-            when (intent.getStringExtra(EXTRA_COMMANDE))
-            {
+
+        // si on reçoit le intent de commande
+        if (intent !== null && intent.hasExtra(EXTRA_COMMANDE)) {
+            when (intent.getStringExtra(EXTRA_COMMANDE)) {
                 COMMANDE_PLAY -> {
-                    //lecture :
+                    // on lance/relace la musique :
                     mediaPlayer.start()
-                    //fin du titre en cours
+                    isMusicPlay = true
+                    // si le titre en cours ce finis on ajoute 1 a la postion dans la playlist
+                    // et on lance si existe sinon on reviens à la position 0
                     mediaPlayer.setOnCompletionListener {
-                        Log.d("tag-dev", "end music")
                         mediaPlayer.stop()
-                        Log.d("tag-dev", "position $position, size phone ${playlist_phone!!.size}, size favoris ${playlist_favoris.size}")
                         position += 1
                         var location : String = ""
                         if (playlist == PLAYLIST_PHONE) {
@@ -115,30 +136,45 @@ class MusicPlayerService : Service() {
                             }
                             location = playlist_favoris[position].location
                         }
-                        Log.d("tag-dev", "playlist $playlist, position $position, location $location")
                         mediaPlayer = MediaPlayer.create(this, Uri.parse(location))
                         mediaPlayer.start()
                     }
-                    val intentBroad = Intent("com.android.activity.BTN_PLAYER")
+
+                    // envoi du broadcast pour modifier le bouton sur MainActivity
+                    val intentBroad = Intent(MainActivity.BROADCAST_BTN_MAIN)
                     intentBroad.putExtra("btn", "play")
                     sendBroadcast(intentBroad)
+
+                    // on démarre la notification si déjà pas affiché
+                    // démarrage en foreground pour avoir toujours la notif et la musique
+                    if (!isServiceRunning) {
+                        isServiceRunning = true
+                        startForeground(NOTIFY_ID, displayNotification(this).build())
+                    }
                 }
                 COMMANDE_PAUSE -> {
-                    // pause :
+                    // on met en pause la musique :
                     mediaPlayer.pause()
-                    val intentBroad = Intent("com.android.activity.BTN_PLAYER")
+                    isMusicPlay = false
+
+                    // envoi du broadcast pour modifier le bouton sur MainActivity
+                    val intentBroad = Intent(MainActivity.BROADCAST_BTN_MAIN)
                     intentBroad.putExtra("btn", "pause")
                     sendBroadcast(intentBroad)
                 }
                 COMMANDE_STOP -> {
-                    // stop :
+                    // on stop tout, on retire les boutons et la notification :
                     mediaPlayer.stop()
                     mediaPlayer.reset()
+                    isMusicPlay = false
+                    isServiceRunning = false
+                    stopForeground(true)
+//                    stopSelf()
 //                    mediaPlayer.release()
                 }
             }
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -152,5 +188,58 @@ class MusicPlayerService : Service() {
         mediaPlayer.stop()
         mediaPlayer.reset()
         mediaPlayer.release()
+    }
+
+    // fonction pour afficher la notification
+    fun displayNotification(context: Context): Notification.Builder {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val expandedView = RemoteViews(context.packageName, R.layout.notification_music)
+        val notifyIntent = Intent(context, MainActivity::class.java)
+        notifyIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        val pendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // en fonction de la version android
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationChannel = NotificationChannel(channelId, description, NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.GREEN
+            notificationChannel.enableVibration(false)
+            notificationManager.createNotificationChannel(notificationChannel)
+
+            builder = Notification.Builder(context, channelId)
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setCustomContentView(expandedView)
+//                    .setCustomBigContentView(expandedView)
+                    .setContentTitle("Music Player")
+                    .setContentText("Control Audio")
+                    .setOngoing(true)
+                    .setAutoCancel(true)
+        } else {
+            builder = Notification.Builder(context)
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+//                    .setCustomContentView(expandedView)
+//                    .setCustomBigContentView(expandedView)
+                    .setContentTitle("Music Player")
+                    .setContentText("Control Audio")
+                    .setOngoing(true)
+                    .setAutoCancel(true)
+        }
+
+        // on ajoute a gestion des boutons
+        setListeners(expandedView, context)
+        return builder
+    }
+
+    // function de gestion des boutons
+    // action à effectuer au clic
+    private fun setListeners(view: RemoteViews, context: Context) {
+        val pause = Intent(NOTIFY_PAUSE)
+        val play = Intent(NOTIFY_PLAY)
+        val pPause = PendingIntent.getBroadcast(context, 0, pause, PendingIntent.FLAG_UPDATE_CURRENT)
+        view.setOnClickPendingIntent(R.id.pause, pPause)
+        val pPlay = PendingIntent.getBroadcast(context, 0, play, PendingIntent.FLAG_UPDATE_CURRENT)
+        view.setOnClickPendingIntent(R.id.play, pPlay)
     }
 }

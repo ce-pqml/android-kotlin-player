@@ -1,14 +1,12 @@
 package com.example.projetavancemusique
 
 import android.Manifest
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -33,9 +31,16 @@ import com.example.projetavancemusique.service.getAllMusicPhone
 class MainActivity : AppCompatActivity() {
     private lateinit var musicAdapter: MusicAdapter
     private lateinit var musicFavorisAdapter: MusicFavorisAdapter
-    var isAdpaterFav : Boolean = false
     private lateinit var monBroadcastReceiver: BtnBroadcastReceiver
+    var isAdpaterFav : Boolean = false
 
+    companion object
+    {
+        const val BROADCAST_BTN_MAIN = "com.android.activity.BTN_PLAYER"
+        const val PERMISSIONS_STORAGE_ID = 473
+    }
+
+    // broadcast unique du MainActivity pour changer les boutons
     inner class BtnBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             changeBtn(intent.getStringExtra("btn"))
@@ -46,46 +51,63 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // on vérifie si on a l'a permission de voir le STORAGE
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
         if (permission == PackageManager.PERMISSION_GRANTED) {
             loadPlaylist()
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 473)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSIONS_STORAGE_ID)
         }
+
+        // mise en place de l'action du bouton play/pause
+        // change son image on fonction de l'état du MusicPlayerService
         val playPause: ImageButton = findViewById(R.id.play_pause)
+        if (MusicPlayerService.isMusicPlay) {
+            playPause.setImageResource(R.drawable.ic_baseline_pause_48)
+        } else {
+            playPause.setImageResource(R.drawable.ic_baseline_play_arrow_48)
+        }
+
         playPause.setOnClickListener {
-            val imgTag: String? = playPause.tag as? String
             val i = Intent(this, MusicPlayerService::class.java)
-            if (imgTag == "pause") {
+            if (!MusicPlayerService.isMusicPlay) {
                 playPause.setImageResource(R.drawable.ic_baseline_pause_48)
-                playPause.tag = "play"
                 i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
                 this.startService(i)
             } else {
                 playPause.setImageResource(R.drawable.ic_baseline_play_arrow_48)
-                playPause.tag = "pause"
                 i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PAUSE)
                 this.startService(i)
             }
         }
 
+        // mise en place de l'action sur le bouton stop
         val stopBtn: ImageButton = findViewById(R.id.stop_btn)
         stopBtn.setOnClickListener {
-            val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.cancel(7634)
             val actionBtn: LinearLayout = findViewById(R.id.btn_player_liste)
             if (actionBtn.isVisible) {
                 actionBtn.visibility = View.GONE
             }
+
             val i = Intent(this, MusicPlayerService::class.java)
             i.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_STOP)
             this.startService(i)
         }
 
+        // si le service tourne déjà, on affiche les boutons
+        if (MusicPlayerService.isServiceRunning) {
+            val actionBtn: LinearLayout = findViewById(R.id.btn_player_liste)
+            if (!actionBtn.isVisible) {
+                actionBtn.visibility = View.VISIBLE
+            }
+        }
+
+        // register du broadcast pour changer les boutons du MainActivity
         monBroadcastReceiver = BtnBroadcastReceiver()
-        registerReceiver(monBroadcastReceiver, IntentFilter("com.android.activity.BTN_PLAYER"))
+        registerReceiver(monBroadcastReceiver, IntentFilter(BROADCAST_BTN_MAIN))
     }
 
+    // function du chargement des playlist dans le service MusicPlayerService
     fun loadPlaylist() {
         findViewById<TextView>(R.id.denied_msg).visibility = View.GONE
         val listMusicFavoris: MutableList<MusicFavoris> = AppDatabaseHelper.getDatabase(this)
@@ -113,6 +135,7 @@ class MainActivity : AppCompatActivity() {
         this.startService(intent)
     }
 
+    // on change l'image du bouton en fonction de l'état de la musique
     fun changeBtn(action: String?)
     {
         val playPause: ImageButton = findViewById(R.id.play_pause)
@@ -123,11 +146,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // affiche du menu favoris
     override fun onCreateOptionsMenu(menu: Menu): Boolean
     {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
+
+    // action au clic sur le menu favoris
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         return when (item.itemId)
@@ -149,8 +175,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // si retour de permissions
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == 473) {
+        if (requestCode == PERMISSIONS_STORAGE_ID) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 loadPlaylist()
             } else {

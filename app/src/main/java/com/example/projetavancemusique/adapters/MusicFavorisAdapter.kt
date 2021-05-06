@@ -1,25 +1,20 @@
 package com.example.projetavancemusique.adapters
 
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetavancemusique.MainActivity
-import com.example.projetavancemusique.NotificationMusic
 import com.example.projetavancemusique.R
 import com.example.projetavancemusique.database.AppDatabaseHelper
 import com.example.projetavancemusique.models.MusicFavoris
-import com.example.projetavancemusique.service.MusicPhone
+import com.example.projetavancemusique.models.MusicPhone
 import com.example.projetavancemusique.service.MusicPlayerService
 
 
@@ -44,18 +39,18 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
 
     override fun getItemCount(): Int = listMusic.size
 
+    // ajout d'une musique en favoris
     fun addItem(musicFavoris: MusicFavoris)
     {
         listMusic.add(listMusic.size, musicFavoris)
         val id = AppDatabaseHelper.getDatabase(mainActivity)
             .musicFavorisDAO()
             .insert(musicFavoris)
-//        notifyItemChanged(0)
         musicFavoris.id = id
-        Log.d("tag-dev", "$id")
         notifyDataSetChanged()
     }
 
+    // on retire une musique avec son id de liste non-favoris (telephone)
     fun removeItemWithIdPhone(idPhone: Int) {
         val musicToDelete = listMusic.find { it.idPhone == idPhone }
         if (musicToDelete != null) {
@@ -69,6 +64,7 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
         }
     }
 
+    // on retire une musique favoris avec sa position
     fun removeItem(position: Int) {
         val musicToDelete = listMusic[position]
         listMusic.removeAt(position)
@@ -84,12 +80,6 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
         mainActivity.startService(intent)
     }
 
-    fun updateList(listMusic: MutableList<MusicFavoris>)
-    {
-        this.listMusic = listMusic
-        notifyDataSetChanged()
-    }
-
     // ViewHolder :
     inner class MusicViewHolder(itemView: View, mainActivity: MainActivity) : RecyclerView.ViewHolder(itemView)
     {
@@ -101,27 +91,23 @@ class MusicFavorisAdapter(private var listMusic: MutableList<MusicFavoris>, priv
         val btnFavoris: ImageButton = itemView.findViewById(R.id.music_favoris_btn)
 
         init {
+            // au clic on indique au service de lancer la musique et la notification
+            // en ajoutant un intent avec les infos nécessaire
             chooseMusic.setOnClickListener {
-                Log.d("tag-dev", listMusic[adapterPosition].location)
-                val musicToListen = listMusic[adapterPosition]
-
-//                NotificationMusic().startMusic(mainActivity, musicToListen.location)
-
                 val actionBtn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
                 if (!actionBtn.isVisible) {
                     actionBtn.visibility = View.VISIBLE
                 }
 
-//                val intent = Intent(mainActivity, MusicPlayerService::class.java)
-//
-//                intent.putExtra("queue", listMusic.toTypedArray())
-//                intent.putExtra("position", adapterPosition)
-//                intent.putExtra("music", musicToListen.location)
-//                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
-//                mainActivity.startService(intent)
-                NotificationMusic().startMusic(mainActivity, MusicPlayerService.PLAYLIST_FAVORIS , adapterPosition)
+                val intent = Intent(mainActivity, MusicPlayerService::class.java)
+                intent.putExtra(MusicPlayerService.EXTRA_PLAYLIST, MusicPlayerService.PLAYLIST_FAVORIS)
+                intent.putExtra(MusicPlayerService.EXTRA_POSITION, adapterPosition)
+                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+                mainActivity.startService(intent)
             }
 
+            // au clic on modifie l'icone favoris dans la liste des non-favoris (telephone)
+            // et on retire de la liste des favoris
             btnFavoris.setOnClickListener {
                 val musicFavorisToRemove = listMusic[adapterPosition]
                 if (listMusicPhone != null) {

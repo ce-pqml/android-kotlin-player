@@ -1,12 +1,6 @@
 package com.example.projetavancemusique.adapters
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +11,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetavancemusique.MainActivity
-import com.example.projetavancemusique.NotificationMusic
 import com.example.projetavancemusique.R
 import com.example.projetavancemusique.models.MusicFavoris
-import com.example.projetavancemusique.service.MusicPhone
+import com.example.projetavancemusique.models.MusicPhone
 import com.example.projetavancemusique.service.MusicPlayerService
 
 
@@ -49,14 +42,6 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
 
     override fun getItemCount(): Int = listMusic.size
 
-    fun removeItemFavorite(idPhone: Int) {
-        val musicToDelete = listMusic.find { it.idPhone == idPhone }
-        if (musicToDelete != null) {
-            listMusic.remove(musicToDelete)
-            notifyDataSetChanged()
-        }
-    }
-
     fun updateList(listMusic: MutableList<MusicPhone>)
     {
         this.listMusic = listMusic
@@ -77,33 +62,33 @@ class MusicAdapter(private var listMusic: MutableList<MusicPhone>, private var m
         val chooseMusic: ConstraintLayout = itemView.findViewById(R.id.music_item_box)
         val btnFavoris: ImageButton = itemView.findViewById(R.id.music_favoris_btn)
 
-        var notificationManager = mainActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         init {
+            // au clic on indique au service de lancer la musique et la notification
+            // en ajoutant un intent avec les infos nécessaire
             chooseMusic.setOnClickListener {
-                Log.d("tag-dev", listMusic[adapterPosition].location)
-                val musicToListen = listMusic[adapterPosition]
+                val intent = Intent(mainActivity, MusicPlayerService::class.java)
+                intent.putExtra(MusicPlayerService.EXTRA_PLAYLIST, MusicPlayerService.PLAYLIST_PHONE)
+                intent.putExtra(MusicPlayerService.EXTRA_POSITION, adapterPosition)
+                intent.putExtra(MusicPlayerService.EXTRA_COMMANDE, MusicPlayerService.COMMANDE_PLAY)
+                mainActivity.startService(intent)
 
-                NotificationMusic().startMusic(mainActivity, MusicPlayerService.PLAYLIST_PHONE , adapterPosition)
-
-                val action_btn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
-                if (!action_btn.isVisible) {
-                    action_btn.visibility = View.VISIBLE
+                val actionBtn: LinearLayout = mainActivity.findViewById(R.id.btn_player_liste)
+                if (!actionBtn.isVisible) {
+                    actionBtn.visibility = View.VISIBLE
                 }
             }
 
+            // au clic sur l'icone favoris
+            // on modifie l'icone favoris
+            // on ajoute ou retire de la liste des favoris
             btnFavoris.setOnClickListener {
                 val musicToFavoris = listMusic[adapterPosition]
-                Log.d("tag-dev", musicToFavoris.toString())
-                if (musicToFavoris.favorite) {
-                    Log.d("tag-dev", "remove-fav")
 
+                if (musicToFavoris.favorite) {
                     //TODO Changer la manière de réatribution de la valeur (la virer (music) de la liste, et la remettre dans la liste)
                     listMusic[adapterPosition].favorite = false
                     musicFavorisAdapter.removeItemWithIdPhone(musicToFavoris.idPhone)
                 } else {
-                    Log.d("tag-dev", "add-fav")
-
                     //TODO Changer la manière de réatribution de la valeur
                     listMusic[adapterPosition].favorite = true
                     musicFavorisAdapter.addItem(MusicFavoris(0, musicToFavoris.title, musicToFavoris.size, musicToFavoris.duration, musicToFavoris.location, musicToFavoris.idPhone))
